@@ -1,0 +1,177 @@
+# versin: '1.29.2'
+# services:
+#   elasticsearch:
+#     image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+#     container_name: elasticsearch
+#     restart: always
+#     environment:
+#       - xpack.security.enabled=false
+#       - discovery.type=single-node
+#     ulimits:
+#       memlock: 
+#         soft: -1
+#         hard: -1
+#       nofile:
+#         soft: 65536
+#         hard: 65536
+#       cap_add:
+#         - IPC_LOCK
+#       volumes:
+#         - elasticsearch-data:/usr/share/elasticsearch/data
+#       ports:
+#         - 9200:9200    
+
+
+#   kibana:
+#     image: docker.elastic.co/kibana/kibana:7.4.0
+#     container_name: elasticsearch
+#     restart: always
+#     environment:
+#       - xpack.security.enabled=false
+#       - discovery.type=single-node
+#     ports:
+#         - 5601:5601
+#     depends_on:
+#       - elasticsearch
+
+# volumes:
+#   elasticsearch-data-volume:
+#     driver: local        
+
+version: '3'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.3.2
+    ports:
+      - "5601:5601"
+
+
+  Logstash:
+    image: docker.elastic.co/logstash/logstash:8.2.0
+    container_name: logstash
+    restart: always
+    volumes:
+    - ./logstash/:/logstash_dir
+    command: logstash -f /logstash_dir/logstash.conf 
+    depends_on:
+      - elasticsearch
+    ports:
+    - '9600:9600'
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"    
+
+# version: '3.6'
+# services:
+#   Elasticsearch:
+#     image: docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+#     container_name: elasticsearch
+#     restart: always
+#     volumes:
+#     - elastic_data:/usr/share/elasticsearch/data/
+#     environment:
+#       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+#       discovery.type: single-node    
+#     ports:
+#     - '9200:9200'
+#     networks:
+#       - elk
+
+#   Logstash:
+#     image: docker.elastic.co/logstash/logstash:8.2.0
+#     container_name: logstash
+#     restart: always
+#     volumes:
+#     - ./logstash/:/logstash_dir
+#     command: logstash -f /logstash_dir/logstash.conf 
+#     depends_on:
+#       - Elasticsearch
+#     ports:
+#     - '9600:9600'
+#     environment:
+#       LS_JAVA_OPTS: "-Xmx256m -Xms256m"    
+#     networks:
+#       - elk
+
+#   Kibana:
+#     image: docker.elastic.co/kibana/kibana:6.3.2
+#     container_name: kibana
+#     restart: always       
+#     ports:
+#     - '5601:5601'
+#     environment:
+#       - ELASTICSEARCH_URL=http://elasticsearch:9200  
+#     depends_on:
+#       - Elasticsearch  
+#     networks:
+#       - elk
+# volumes:
+#   elastic_data: {}
+
+# networks:
+#   elk:
+
+
+
+# version: '3.6'
+# services:
+#   Elasticsearch:
+#     image: elasticsearch:7.16.2
+#     container_name: elasticsearch
+#     restart: always
+#     volumes:
+#     - elastic_data:/usr/share/elasticsearch/data/
+#     environment:
+#       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+#       discovery.type: single-node    
+#     ports:
+#     - '9200:9200'
+#     - '9300:9300'
+#     networks:
+#       - elk
+
+#   Logstash:
+#     image: logstash:7.16.2
+#     container_name: logstash
+#     restart: always
+#     volumes:
+#     - ./logstash/:/logstash_dir
+#     command: logstash -f /logstash_dir/logstash.conf 
+#     depends_on:
+#       - Elasticsearch
+#     ports:
+#     - '9600:9600'
+#     environment:
+#       LS_JAVA_OPTS: "-Xmx256m -Xms256m"    
+#     networks:
+#       - elk
+
+#   Kibana:
+#     image: kibana:7.16.2
+#     container_name: kibana
+#     restart: always       
+#     ports:
+#     - '5601:5601'
+#     environment:
+#       - ELASTICSEARCH_URL=http://elasticsearch:9200  
+#     depends_on:
+#       - Elasticsearch  
+#     networks:
+#       - elk
+# volumes:
+#   elastic_data: {}
+
+# networks:
+#   elk:
